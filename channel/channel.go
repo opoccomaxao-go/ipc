@@ -28,7 +28,7 @@ func (c *Channel) Send(event *event.Common) error {
 		if errors.Is(err, transport.ErrClosed) {
 			err := c.reconnect()
 			if err != nil {
-				return err
+				return errors.WithStack(err)
 			}
 		}
 	}

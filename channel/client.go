@@ -18,7 +18,7 @@ type ClientConfig struct {
 	Address string                 // PublicAddr is used for listen (Server) / connect (Client)
 }
 
-func Connect(config ClientConfig) (*Client, error) {
+func Dial(config ClientConfig) (*Client, error) {
 	if config.Address == "" {
 		return nil, errors.WithMessage(ErrNoParam, "Address")
 	}

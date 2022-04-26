@@ -65,3 +65,14 @@ func (e *Common) ReadBinary(reader io.Reader) error {
 
 	return nil
 }
+
+func (e *Common) Copy() *Common {
+	res := &Common{
+		Type:    e.Type,
+		Payload: make([]byte, len(e.Payload)),
+	}
+
+	copy(res.Payload, e.Payload)
+
+	return res
+}
