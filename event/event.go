@@ -1,6 +1,7 @@
 package event
 
 import (
+	"fmt"
 	"io"
 
 	"github.com/pkg/errors"
@@ -17,6 +18,10 @@ type Common struct {
 }
 
 type eventHeader [4]byte
+
+func (e *Common) DebugString() string {
+	return fmt.Sprintf("#%d : %d Byte", e.Type, len(e.Payload))
+}
 
 //nolint:gomnd
 func (e *Common) WriteBinary(writer io.Writer) error {
@@ -44,7 +49,7 @@ func (e *Common) WriteBinary(writer io.Writer) error {
 func (e *Common) ReadBinary(reader io.Reader) error {
 	var header eventHeader
 
-	_, err := reader.Read(header[:])
+	_, err := io.ReadFull(reader, header[:])
 	if err != nil {
 		return errors.WithStack(err)
 	}
@@ -58,7 +63,7 @@ func (e *Common) ReadBinary(reader io.Reader) error {
 		e.Payload = make([]byte, size)
 	}
 
-	_, err = reader.Read(e.Payload)
+	_, err = io.ReadFull(reader, e.Payload)
 	if err != nil {
 		return errors.WithStack(err)
 	}

@@ -95,6 +95,7 @@ func TestClientServer(t *testing.T) {
 	serverRecvWG.Wait()
 	clientRecvWG.Wait()
 	require.NoError(t, server.Close())
+	require.NoError(t, client.Close())
 
 	assert.Equal(t, serverEventsToSend, clientReceiver.Collect())
 	assert.Equal(t, clientEventsToSend, serverReceiver.Collect())

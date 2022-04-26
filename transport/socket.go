@@ -1,7 +1,9 @@
 package transport
 
 import (
+	"io"
 	"net"
+	"syscall"
 
 	"github.com/opoccomaxao-go/ipc/event"
 	"github.com/pkg/errors"
@@ -15,7 +17,9 @@ type Socket struct {
 var _ Transport = &Socket{}
 
 func (*Socket) checkError(err error) error {
-	if errors.Is(err, net.ErrClosed) {
+	if errors.Is(err, net.ErrClosed) ||
+		errors.Is(err, io.EOF) ||
+		errors.Is(err, syscall.ECONNRESET) {
 		return ErrClosed
 	}
 

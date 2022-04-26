@@ -14,8 +14,9 @@ type Client struct {
 }
 
 type ClientConfig struct {
-	Handler Handler[*event.Common] // Handler handles incoming events
-	Address string                 // PublicAddr is used for listen (Server) / connect (Client)
+	Handler   Handler[*event.Common] // Handler handles incoming events.
+	Address   string                 // Address is used to connect.
+	Reconnect bool                   // Reconnect if reconnection needed.
 }
 
 func Dial(config ClientConfig) (*Client, error) {
@@ -37,9 +38,12 @@ func Dial(config ClientConfig) (*Client, error) {
 	}
 
 	res.Channel = &Channel{
-		Connect:   res.connect,
 		Transport: transport,
 		TryCount:  100,
+	}
+
+	if config.Reconnect {
+		res.Channel.Connect = res.connect
 	}
 
 	return res, nil
