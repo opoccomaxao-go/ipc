@@ -14,7 +14,7 @@ type Socket struct {
 }
 
 // implements interface.
-var _ Transport = &Socket{}
+var _ Transport = (*Socket)(nil)
 
 func (*Socket) checkError(err error) error {
 	if errors.Is(err, net.ErrClosed) ||

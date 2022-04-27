@@ -12,7 +12,7 @@ type Stream struct {
 }
 
 // implements interface.
-var _ Transport = &Stream{}
+var _ Transport = (*Stream)(nil)
 
 func (s *Stream) Write(event event.Event) error {
 	return errors.WithStack(event.WriteBinary(s.source))

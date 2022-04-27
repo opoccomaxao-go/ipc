@@ -15,10 +15,14 @@ type Channel struct {
 	Connect   ConnectFn
 	TryCount  int
 	closed    bool
-	mu        sync.Mutex
+	stateMu   sync.Mutex
+	sendMu    sync.Mutex
 }
 
 func (c *Channel) Send(event *event.Common) error {
+	c.sendMu.Lock()
+	defer c.sendMu.Unlock()
+
 	for i := c.TryCount; i > 0; i-- {
 		err := errors.WithStack(c.Transport.Write(event))
 		if err == nil {
@@ -55,8 +59,8 @@ func (c *Channel) Serve(handler Handler[*event.Common]) error {
 }
 
 func (c *Channel) reconnect() error {
-	c.mu.Lock()
-	defer c.mu.Unlock()
+	c.stateMu.Lock()
+	defer c.stateMu.Unlock()
 
 	if c.closed || c.Connect == nil {
 		return errors.WithStack(transport.ErrClosed)
@@ -73,10 +77,12 @@ func (c *Channel) reconnect() error {
 }
 
 func (c *Channel) Close() error {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
+	c.stateMu.Lock()
 	c.closed = true
+	c.stateMu.Unlock()
+
+	c.sendMu.Lock()
+	defer c.sendMu.Unlock()
 
 	return errors.WithStack(c.Transport.Close())
 }
