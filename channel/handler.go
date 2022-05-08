@@ -10,12 +10,8 @@ type Handler[T any] interface {
 
 type HandlerFunc[T any] func(T)
 
-type CommonHandler[T any] struct {
-	Func HandlerFunc[T]
-}
-
-func (h *CommonHandler[T]) Handle(value T) {
-	h.Func(value)
+func (f HandlerFunc[T]) Handle(value T) {
+	f(value)
 }
 
 // CollectorHandler for test purposes.

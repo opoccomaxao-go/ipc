@@ -54,17 +54,15 @@ func TestClientServer(t *testing.T) {
 	var server *Server
 	server, err := NewServer(ServerConfig{
 		Address: ":10001",
-		Handler: &CommonHandler[*Channel]{
-			Func: func(connection *Channel) {
-				go sendData(serverEventsToSend, connection)
-				go func() {
-					err := connection.Serve(&serverReceiver)
-					if err != nil {
-						require.ErrorIs(t, err, transport.ErrClosed)
-					}
-				}()
-			},
-		},
+		Handler: HandlerFunc[*Channel](func(connection *Channel) {
+			go sendData(serverEventsToSend, connection)
+			go func() {
+				err := connection.Serve(&serverReceiver)
+				if err != nil {
+					require.ErrorIs(t, err, transport.ErrClosed)
+				}
+			}()
+		}),
 	})
 
 	require.NoError(t, err)
